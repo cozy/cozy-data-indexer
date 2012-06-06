@@ -13,10 +13,12 @@ class Client():
         return json_decode(response["data"])
 
     def post(self, path, data):
-        return requests.get(self.host + path, data=json_encode(data))
+        response = requests.get(self.host + path, data=json_encode(data))
+        return json_decode(response["data"])
 
     def put(self, path, data):
-        return requests.put(self.host + path, data=json_encode(data))
+        response = requests.put(self.host + path, data=json_encode(data))
+        return json_decode(response["data"])
 
 client = Client()
 
