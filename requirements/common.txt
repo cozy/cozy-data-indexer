@@ -1,1 +1,2 @@
 tornado==2.2
+asyncmongo==1.2.1

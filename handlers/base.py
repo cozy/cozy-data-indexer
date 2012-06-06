@@ -1,5 +1,6 @@
 import json
 import tornado.web
+import asyncmongo
 
 import logging
 logger = logging.getLogger('boilerplate.' + __name__)
@@ -9,6 +10,18 @@ class BaseHandler(tornado.web.RequestHandler):
     """A class to collect common handler methods - all other handlers should
     subclass this one.
     """
+
+    @property
+    def db(self):
+        if not hasattr(self, '_db'):
+            self._db = asyncmongo.Client(
+                pool_id='cozy', 
+                host='127.0.0.1', 
+                port=27017, 
+                maxcached=10, 
+                maxconnections=50, 
+                dbname='cozy')
+        return self._db
 
     def load_json(self):
         """Load JSON from the request body and store them in
@@ -24,7 +37,7 @@ class BaseHandler(tornado.web.RequestHandler):
             logger.debug(msg)
             raise tornado.web.HTTPError(400, msg)
 
-    def get_json_argument(self, name, default=None):
+    def get_field(self, name, default=None):
         """Find and return the argument with key 'name' from JSON request data.
         Similar to Tornado's get_argument() method.
         """
