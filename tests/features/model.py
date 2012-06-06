@@ -59,5 +59,3 @@ def check_that_exists_true_is_returned(step):
     assert "exists" in world.response
     assert world.response["exists"]
 
-
-

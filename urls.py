@@ -1,5 +1,7 @@
-from handlers.foo import FooHandler
+from handlers import db
 
 url_patterns = [
-    (r"/foo", FooHandler),
+    (r"/$", db.VersionHandler),
+    (r"/db/exists/$", db.ExistsHandler),
+    (r"/db/create/$", db.CreateHandler),
 ]
