@@ -1,9 +1,9 @@
 import json
 import tornado.web
-import asyncmongo
+from asyncmongo import Client
 
 import logging
-logger = logging.getLogger('boilerplate.' + __name__)
+logger = logging.getLogger('cozy-data-system.' + __name__)
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -14,7 +14,7 @@ class BaseHandler(tornado.web.RequestHandler):
     @property
     def db(self):
         if not hasattr(self, '_db'):
-            self._db = asyncmongo.Client(
+            self._db = Client(
                 pool_id='cozy', 
                 host='127.0.0.1', 
                 port=27017, 

@@ -5,7 +5,7 @@ from lettuce import step, world
 from tornado.escape import json_encode, json_decode
 
 class Client():
-    def __init__(self, host="localhost:30000"):
+    def __init__(self, host="localhost:8888"):
         self.host = "http://%s/" % host
 
     def get(self, path, data):
