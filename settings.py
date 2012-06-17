@@ -8,6 +8,7 @@ define("port", default=30000, help="run on the given port", type=int)
 define("config", default=None, help="tornado config file")
 define("debug", default=False, help="debug mode")
 define("static_path", default=None)
+define("with_xunit", default=None)
 tornado.options.parse_command_line()
 
 class DeploymentType:
