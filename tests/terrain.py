@@ -46,10 +46,11 @@ def run_server():
 
 @after.all
 def kill_server(total):
-
     logger = logging.getLogger("")
+
     logger.info("Stop server.")
 
     world.server.http.stop()
     tornado.ioloop.IOLoop.instance().stop()
+    sys.exit()
 
