@@ -1,7 +1,6 @@
 ## Cozy Data System
 
-Little API that act as a middleware between applications and data sent to the 
-database, to the indexer and to the file system.
+Little API that provides indexation and full-text search features. 
 
 NB: built from Bueda Tornado Boilerplate
 
