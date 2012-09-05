@@ -8,11 +8,12 @@ from tornado.options import options
 
 from app import CozyDataSystem
 
+app = CozyDataSystem()
+
 def main():
     logger = logging.getLogger("")
     logger.info("Cozy Data System started on port %d." % options.port)
     try:
-        app = CozyDataSystem()
         http_server = tornado.httpserver.HTTPServer(app)
         http_server.listen(options.port)
         tornado.ioloop.IOLoop.instance().start()
