@@ -4,6 +4,9 @@ import sys
 import tornado.ioloop
 import tornado.httpserver
 import tornado.ioloop
+import os
+import shutil
+
 import tornado.web
 
 from threading import Thread
@@ -29,6 +32,11 @@ class Server(Thread):
             tornado.ioloop.IOLoop.instance().stop()
             print ""
             logger.info("Cozy Data System stopped.")
+
+@before.all
+def del_indexes():
+    if os.path.exists("indexes"):
+        shutil.rmtree("indexes")
 
 @before.all
 def run_server():
