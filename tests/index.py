@@ -1,14 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from lettuce import step, after, world
+from lettuce import step, world
 from nose.tools import assert_equals
 
 from lib.indexer import Indexer
-
-@after.all
-def delete_indexes(scenario):
-    if os.path.exists("indexes"):
-        shutil.rmtree("indexes")
 
 def createNote(id, title, content):
     note = dict()
@@ -43,9 +38,17 @@ def and_i_index_them(step):
 
 @step(u'When I ask for search "([^"]*)"')
 def when_i_ask_for_search_group1(step, word):
-    world.ids = world.indexer.search_doc(unicode(word))
+    world.ids = world.indexer.search_doc(unicode(word), "Note")
 
-@step(u'Then I got it returns me the note about "([^"]*)"')
-def then_i_got_it_returns_me_note_the_note_about_group1(step, group1):
+@step(u'It returns me the note about "([^"]*)"')
+def it_returns_me_note_the_note_about_group1(step, group1):
     assert_equals(len(world.ids), 1)
     assert_equals(world.ids[0], unicode(world.notes[3]["id"]))
+
+@step(u'Given I remove the note about "([^"]*)"')
+def given_i_remove_the_note_about_group1(step, group1):
+    world.indexer.remove_doc(world.ids[0])
+
+@step(u'Then It returns nothing')
+def then_it_returns_nothing(step):
+    assert_equals(len(world.ids), 0)

@@ -1,18 +1,15 @@
 import logging
 import sys
 
-import tornado.ioloop
-import tornado.httpserver
-import tornado.ioloop
 import os
 import shutil
+from threading import Thread
 
 import tornado.web
+import tornado.httpserver
+import tornado.ioloop
 
-from threading import Thread
 from lettuce import before, after, world
-
-
 
 
 class Server(Thread):
@@ -33,14 +30,15 @@ class Server(Thread):
             print ""
             logger.info("Cozy Data System stopped.")
 
-@before.all
-def del_indexes():
+
+@before.each_feature
+def del_indexes(feature):
     if os.path.exists("indexes"):
         shutil.rmtree("indexes")
 
 @before.all
 def run_server():
-    sys.path.append("../")
+
     sys.path.append("../venv/lib/python2.7/site-packages/")
     from app import CozyDataSystem
     app = CozyDataSystem()
