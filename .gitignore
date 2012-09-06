@@ -1,3 +1,6 @@
 *.swp
 *.pyc
 venv
+virtualenv
+lettuce*
+indexes
