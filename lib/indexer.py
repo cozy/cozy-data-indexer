@@ -1,19 +1,35 @@
 import os
 
 from whoosh.qparser import QueryParser
-from whoosh.query import Variations
+from whoosh.query import FuzzyTerm, And, Term
 
 from whoosh import index
 from whoosh.fields import Schema, ID, KEYWORD, TEXT
 
+from whoosh.support.charset import accent_map
+from whoosh.analysis import RegexTokenizer
+from whoosh.analysis import CharsetFilter, LowercaseFilter, StopFilter
+
+from lib.stopwords import stoplists
 
 class IndexSchema():
+    """
+    Init schema and build a custom analyzer.
+
+    All data to index will be put inside the
+    """
 
     def __init__(self):
-        self.schema = Schema(content=TEXT, 
-                        docType=TEXT, 
-                        docId=ID(stored=True), 
-                        tags=KEYWORD)
+
+        chfilter = CharsetFilter(accent_map)
+        stoplist = stoplists["en"].union(stoplists["fr"])
+        analyzer = RegexTokenizer() | LowercaseFilter() | \
+                   StopFilter(stoplist=stoplist) | chfilter
+
+        self.schema = Schema(content=TEXT(analyzer=analyzer), 
+                             docType=TEXT, 
+                             docId=ID(stored=True), 
+                             tags=KEYWORD)
 
         if not os.path.exists("indexes"):
             os.mkdir("indexes")
@@ -42,18 +58,20 @@ class Indexer():
 
     def search_doc(self, word, docType):
         """
-        Return a list of docs that contains given word.
+        Return a list of docs that contains given word and that matches
+        given type.
         """
 
         indexSchema = IndexSchema()
-        parser = QueryParser("content", schema=indexSchema.schema, 
-                             termclass=Variations)
+        parser = QueryParser("content", schema=indexSchema.schema)
         query = parser.parse(word)
+        query = And([query, Term("docType", unicode(docType.lower()))])
 
         with indexSchema.index.searcher() as searcher:
             results = searcher.search(query)
             return [result["docId"] for result in results]
         
+
     def remove_doc(self, id):
         """
         Remove given doc from index (doc of which docId is equal to id).
