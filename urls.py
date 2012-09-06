@@ -1,5 +1,8 @@
-from handlers import db
+from handlers import indexer
 
 url_patterns = [
-    (r"/$", db.VersionHandler),
+    (r"/$", indexer.VersionHandler),
+    (r"/index/$", indexer.IndexHandler),
+    (r"/index/(.*)/$", indexer.IndexHandler),
+    (r"/search/$", indexer.SearchHandler),
 ]
