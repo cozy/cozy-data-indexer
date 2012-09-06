@@ -63,7 +63,8 @@ class Indexer():
         """
 
         indexSchema = IndexSchema()
-        parser = QueryParser("content", schema=indexSchema.schema)
+        parser = QueryParser("content", schema=indexSchema.schema,
+                termclass=FuzzyTerm)
         query = parser.parse(word)
         query = And([query, Term("docType", unicode(docType.lower()))])
 
