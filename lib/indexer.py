@@ -38,6 +38,15 @@ class IndexSchema():
             self.index = index.open_dir("indexes")
 
 
+    def clear_index(self):
+        """
+        Clear index: whoosh indexe create, create a new index in the directory
+        even if an index exists.
+        """
+
+        if os.path.exists("indexes"):
+            index.create_in("indexes", self.schema)
+
 
 class Indexer():
 
@@ -83,3 +92,12 @@ class Indexer():
         writer = indexSchema.index.writer()
         writer.delete_by_term("docId", unicode(id))
         writer.commit()
+
+    def remove_all(self):
+        '''
+        Remove all data from index.
+        '''
+
+        indexSchema = IndexSchema()
+        indexSchema.clear_index()
+

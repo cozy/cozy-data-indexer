@@ -1,6 +1,4 @@
-from tornado.web import HTTPError
 from tornado.escape import json_encode
-from whoosh.writing import IndexingError
 
 from handlers.base import BaseHandler
 from lib.indexer import Indexer
@@ -8,6 +6,7 @@ from lib.indexer import Indexer
 
 import logging
 logger = logging.getLogger('cozy-data-system.' + __name__)
+
 
 class VersionHandler(BaseHandler):
     '''
@@ -33,7 +32,11 @@ class IndexHandler(BaseHandler):
         doc = self.get_field("doc")
         fields = self.get_field("fields")
 
-        id = doc.get("id", None)
+        if not "id" in doc:
+            id = doc.get("_id", None)
+            doc["id"] = id
+        if not "tags" in doc:
+            doc["tags"] = []
         docType = doc.get("docType", None)
 
         if id is None:
@@ -48,11 +51,14 @@ class IndexHandler(BaseHandler):
             self.write("indexation succeeds")
 
     def delete(self, id):
+        """
+        Remove document that matches id from index.
+        """
+
         indexer = Indexer()
         indexer.remove_doc(unicode(id))
         self.set_status(204)
         self.write("index deletion succeeds")
-
 
 
 class SearchHandler(BaseHandler):
@@ -73,3 +79,15 @@ class SearchHandler(BaseHandler):
         indexer = Indexer()
         result = indexer.search_doc(query, docType)
         self.write(json_encode({ "ids": result }))
+
+
+class ClearHandler(BaseHandler):
+    """
+    Remove all data from index.
+    """
+
+    def delete(self):
+        indexer = Indexer()
+        indexer.remove_all()
+        self.write("deletion succeeds")
+

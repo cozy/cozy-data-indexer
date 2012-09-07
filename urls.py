@@ -5,4 +5,5 @@ url_patterns = [
     (r"/index/$", indexer.IndexHandler),
     (r"/index/(.*)/$", indexer.IndexHandler),
     (r"/search/$", indexer.SearchHandler),
+    (r"/clear-all/$", indexer.ClearHandler),
 ]
