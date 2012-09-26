@@ -56,12 +56,20 @@ class Indexer():
         """
 
         indexSchema = IndexSchema()
-        content = " ".join([doc[field] for field in fields])
+        contents = []
+        for field in fields:
+            data = doc[field]
+            if type(data) == "unicode":
+                contents.append(data)
+            elif data is not None:
+                contents.append(data.encode("utf-8"))
+
+        content = u" ".join(contents)
         writer = indexSchema.index.writer()
         writer.update_document(content=unicode(content),
-                                    docType=unicode(docType),
-                                    docId=unicode(doc["id"]),
-                                    tags=doc["tags"])
+                               docType=unicode(docType),
+                               docId=unicode(doc["id"]),
+                               tags=doc["tags"])
         writer.commit()
 
 
@@ -79,6 +87,7 @@ class Indexer():
 
         with indexSchema.index.searcher() as searcher:
             results = searcher.search(query)
+            print [result["docId"] for result in results]
             return [result["docId"] for result in results]
         
 
@@ -100,4 +109,3 @@ class Indexer():
 
         indexSchema = IndexSchema()
         indexSchema.clear_index()
-

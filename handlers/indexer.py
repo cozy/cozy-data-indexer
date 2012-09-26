@@ -34,14 +34,15 @@ class IndexHandler(BaseHandler):
 
         if not "id" in doc:
             id = doc.get("_id", None)
-            doc["id"] = id
+            if id is None:
+                self.raise_argument_error("doc.id")
+            else:
+                doc["id"] = id
         if not "tags" in doc:
             doc["tags"] = []
-        docType = doc.get("docType", None)
 
-        if id is None:
-            self.raise_argument_error("doc.id")
-        elif docType is None:
+        docType = doc.get("docType", None)
+        if docType is None:
             self.raise_argument_error("doc.docType")
         if not len(fields):
             self.raise_argument_error("fields")
