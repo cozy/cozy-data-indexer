@@ -59,14 +59,14 @@ class Indexer():
         contents = []
         for field in fields:
             data = doc[field]
-            if type(data) == "unicode":
+            if isinstance(data, unicode):
                 contents.append(data)
             elif data is not None:
-                contents.append(data.encode("utf-8"))
+                contents.append(data.decode("utf-8"))
 
         content = u" ".join(contents)
         writer = indexSchema.index.writer()
-        writer.update_document(content=unicode(content),
+        writer.update_document(content=content,
                                docType=unicode(docType),
                                docId=unicode(doc["id"]),
                                tags=doc["tags"])
