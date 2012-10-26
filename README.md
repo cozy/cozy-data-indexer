@@ -1,8 +1,7 @@
 ## Description
 
-Little API that provides indexation and full-text search features. 
-
-NB: built from Bueda Tornado Boilerplate
+Little API that provides indexation and full-text search features to Cozy Cloud
+Data System.
 
 # About Cozy
 
@@ -12,5 +11,4 @@ easily on your server, a single place you control. This means you can manage
 efficiently your data while protecting your privacy without technical skills.
 
 More informations and hosting services on:
-http://www.mycozycloud.com
-
+http://cozycloud.cc
