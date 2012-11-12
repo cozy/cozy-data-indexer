@@ -1,8 +1,10 @@
 import json
 import tornado.web
-
 import logging
-logger = logging.getLogger('cozy-data-system.' + __name__)
+
+from tornado.escape import json_encode
+
+logger = logging.getLogger('cozy-data-indexer.' + __name__)
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -19,7 +21,6 @@ class BaseHandler(tornado.web.RequestHandler):
 
         If JSON cannot be decoded, raises an HTTPError with status 400.
         """
-
         try:
             self.request.arguments = json.loads(self.request.body)
         except ValueError:
@@ -31,7 +32,6 @@ class BaseHandler(tornado.web.RequestHandler):
         """Find and return the argument with key 'name' from JSON request data.
         Similar to Tornado's get_argument() method.
         """
-
         if default is None:
             default = self._ARG_DEFAULT
 
@@ -49,13 +49,22 @@ class BaseHandler(tornado.web.RequestHandler):
         arg = self.request.arguments[name]
         logger.debug("Found '%s': %s in JSON arguments" % (name, arg))
         return arg
-    
+
     def raise_argument_error(self, name):
         """
         Raise a 400 error telling user that an argument is missing.
         """
-
-        msg = "Missing argument '%s'" % name
+        self.raise_error("Missing argument '%s'" % name)
+    
+    def raise_error(self, msg, status_code=400):
+        """
+        Raise a 400 error telling user and loggin given msg.
+        """
         logger.debug(msg)
-        raise tornado.web.HTTPError(400, msg)
+        raise tornado.web.HTTPError(status_code, msg)
 
+    def return_json(self, data, status_code=200):
+        """
+        Convert given data to JSON and return it as response.
+        """
+        self.write(json_encode(data))
