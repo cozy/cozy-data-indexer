@@ -19,6 +19,7 @@ class BankHandler(BaseHandler):
         Grab data from a given bank account.
 
         Bank type is given as URL parameter, credentials are given in body.
+        For available bank type check: http://weboob.org/modules
         """
 
         self.load_json()
