@@ -3,18 +3,17 @@ from tornado.escape import json_encode
 from handlers.base import BaseHandler
 from lib.indexer import Indexer
 
-
 import logging
-logger = logging.getLogger('cozy-data-system.' + __name__)
+logger = logging.getLogger('cozy-data-indexer.' + __name__)
 
 
 class VersionHandler(BaseHandler):
     '''
-    Return current version of Data system.
+    Return current version of Data Indexer.
     '''
 
     def get(self):
-        self.write("Cozy Data System v0.1.0")
+        self.write("Cozy Data Indexer v0.1.0")
 
 
 class IndexHandler(BaseHandler):
@@ -28,6 +27,10 @@ class IndexHandler(BaseHandler):
     '''
 
     def post(self):
+        '''
+        Add given document to index.
+        '''
+
         self.load_json()
         doc = self.get_field("doc")
         fields = self.get_field("fields")
@@ -73,22 +76,24 @@ class SearchHandler(BaseHandler):
     '''
 
     def post(self):
+        '''
+        Perform search query.
+        '''
         self.load_json()
-        query = self.get_field("query")
-        docType = self.get_field("docType")
+        query = self.get_field('query')
+        docType = self.get_field('docType')
 
         indexer = Indexer()
         result = indexer.search_doc(query, docType)
-        self.write(json_encode({ "ids": result }))
+        self.write(json_encode({ 'ids': result }))
 
 
 class ClearHandler(BaseHandler):
-    """
+    '''
     Remove all data from index.
-    """
+    '''
 
     def delete(self):
         indexer = Indexer()
         indexer.remove_all()
-        self.write("deletion succeeds")
-
+        self.write('deletion succeeds')
