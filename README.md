@@ -3,6 +3,8 @@
 Little API that provides indexation and full-text search features to Cozy Cloud
 Data System.
 
+Setup requires lxml2-dev and libxslt-dev packages.
+
 # About Cozy
 
 This app is part of the Cozy platform backend. Cozy is the personal
