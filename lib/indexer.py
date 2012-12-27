@@ -28,7 +28,7 @@ class IndexSchema():
 
         self.schema = Schema(content=TEXT(analyzer=analyzer), 
                              docType=TEXT, 
-                             docId=ID(stored=True), 
+                             docId=ID(stored=True, unique=True), 
                              tags=KEYWORD)
 
         if not os.path.exists("indexes"):
@@ -97,7 +97,6 @@ class Indexer():
         """
 
         indexSchema = IndexSchema()
-
         writer = indexSchema.index.writer()
         writer.delete_by_term("docId", unicode(id))
         writer.commit()
