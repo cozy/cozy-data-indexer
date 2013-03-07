@@ -1,4 +1,4 @@
-tornado==2.2
+tornado==2.4
 whoosh==2.4.1
 git+git://github.com/frankrousseau/weboob.git@master
 python-dateutil
