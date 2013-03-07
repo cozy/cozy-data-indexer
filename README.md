@@ -3,7 +3,36 @@
 Little API that provides indexation and full-text search features to Cozy Cloud
 Data System.
 
-Setup requires lxml2-dev and libxslt-dev packages.
+## Setup
+
+Get build dependencies
+
+    sudo apt-get install python python-pip python-dev lxml2-dev libxslt1-dev
+
+Setup your virtual environment
+
+    sudo pip install virtualenv
+    virtualenv virtualenv
+    . virtualenv/bin/activate
+
+Install dependencies
+
+    pip install -r requirements/common.txt
+    pip install -r requirements/production.txt
+
+Start
+
+    python server.py
+
+## Tests
+
+Install development dependencies
+
+    pip install -r requirements/dev.txt
+
+Run tests
+
+    lettuce tests
 
 # About Cozy
 
