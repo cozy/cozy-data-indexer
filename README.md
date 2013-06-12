@@ -26,6 +26,9 @@ Start
 
 ## Tests
 
+[![Build
+Status](https://travis-ci.org/mycozycloud/cozy-data-indexer.png?branch=master)](https://travis-ci.org/mycozycloud/cozy-data-indexer)
+
 Install development dependencies
 
     pip install -r requirements/dev.txt
