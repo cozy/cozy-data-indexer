@@ -8,3 +8,4 @@ install:
   - "sudo pip install -r requirements/dev.txt --use-mirrors"
 # command to run tests
 script: lettuce tests/
+after_script: echo TRAVIS_TEST_RESULT
