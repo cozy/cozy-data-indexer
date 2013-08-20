@@ -20,7 +20,12 @@ Install dependencies
     pip install -r requirements/common.txt
     pip install -r requirements/production.txt
 
-Start
+Weboob dependency require a specific installation, set it up this way:
+
+    pip install git+git://git.symlink.me/pub/romain/weboob.git
+    pip install git+git://git.symlink.me/pub/romain/weboob.git#egg=weboob-modules  --install-option="--modules"
+
+Start the server:
 
     python server.py
 

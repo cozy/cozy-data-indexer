@@ -1,4 +1,4 @@
-from weboob.core import Weboob
+from weboob.core import WebNip
 
 
 class Connector():
@@ -14,7 +14,7 @@ class Connector():
         '''
         Constructor: initialize connector, set up the weboob backend.
         '''
-        weboob = Weboob()
+        weboob = WebNip()
         self.backend = weboob.build_backend(connector, parameters)
 
     def get_results(self):
