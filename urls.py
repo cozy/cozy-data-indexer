@@ -7,5 +7,6 @@ url_patterns = [
     (r"/index/(.*)/$", indexer.IndexHandler),
     (r"/search/$", indexer.SearchHandler),
     (r"/connectors/bank/([0-9a-z]+)/$", connectors.BankHandler),
+    (r"/connectors/bank/([0-9a-z]+)/history/$", connectors.BankHistoryHandler),
     (r"/clear-all/$", indexer.ClearHandler),
 ]
