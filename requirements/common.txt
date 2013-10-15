@@ -5,5 +5,5 @@ mechanize
 html2text
 lxml
 cssselect
-git+git://git.symlink.me/pub/romain/weboob.git
-git+git://git.symlink.me/pub/weboob/modules.git
+git+https://github.com/frankrousseau/weboob.git
+git+https://github.com/frankrousseau/weboob-modules.git
