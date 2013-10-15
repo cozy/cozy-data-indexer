@@ -1,7 +1,9 @@
 tornado==2.4
 whoosh==2.4.1
-git+https://github.com/frankrousseau/weboob.git@master
 python-dateutil
 mechanize
 html2text
 lxml
+cssselect
+git+https://github.com/frankrousseau/weboob.git
+git+https://github.com/frankrousseau/weboob-modules.git
