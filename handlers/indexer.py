@@ -13,13 +13,13 @@ class VersionHandler(BaseHandler):
     '''
 
     def get(self):
-        self.write("Cozy Data Indexer v0.1.0")
+        self.write("Cozy Data Indexer v1.0.0")
 
 
 class IndexHandler(BaseHandler):
     '''
-    Index given content for given fields. 
-    
+    Index given content for given fields.
+
     Expected fields:
 
     * doc: a document with an id and a docType
@@ -71,8 +71,8 @@ class SearchHandler(BaseHandler):
 
     Expected fields:
 
-    * query: the search query string 
-    * docType: the type of document to look for 
+    * query: the search query string
+    * docType: the type of document to look for
     '''
 
     def post(self):
