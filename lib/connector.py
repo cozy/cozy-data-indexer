@@ -45,7 +45,7 @@ class Connector():
         for account in self.backend.iter_accounts():
             for history in self.backend.iter_history(account):
                 results.append({
-                    "account": account.label,
+                    "account": account.id,
                     "amount": str(history.amount),
                     "date": history.date.strftime(DATETIME_FORMAT),
                     "label": unicode(history.label)
