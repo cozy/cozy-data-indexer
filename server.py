@@ -15,7 +15,7 @@ def main():
     logger.info("Cozy Data System started on port %d." % options.port)
     try:
         http_server = tornado.httpserver.HTTPServer(app)
-        http_server.listen(options.port)
+        http_server.listen(options.port, address="127.0.0.1")
         tornado.ioloop.IOLoop.instance().start()
 
     except KeyboardInterrupt:
