@@ -1,5 +1,5 @@
 tornado==2.4
-whoosh==2.4.1
+whoosh==2.5
 python-dateutil
 mechanize
 html2text
