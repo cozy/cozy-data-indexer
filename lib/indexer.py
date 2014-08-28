@@ -1,7 +1,7 @@
 import os
 
 from whoosh.qparser import QueryParser
-from whoosh.query import FuzzyTerm, And, Term
+from whoosh.query import FuzzyTerm, And, Term, Or
 
 from whoosh import index
 from whoosh.fields import Schema, ID, KEYWORD, TEXT
@@ -78,7 +78,7 @@ class Indexer():
         writer.commit()
 
 
-    def search_doc(self, word, docType, numPage=1, numByPage=10):
+    def search_doc(self, word, docTypes, numPage=1, numByPage=10):
         """
         Return a list of docs that contains given word and that matches
         given type.
@@ -88,10 +88,15 @@ class Indexer():
         parser = QueryParser("content", schema=indexSchema.schema,
                 termclass=FuzzyTerm)
         query = parser.parse(word)
-        query = And([query, Term("docType", unicode(docType.lower()))])
+
+        doctypeFilterMatcher = []
+        for docType in docTypes:
+            doctypeFilterMatcher.append(Term("docType", unicode(docType.lower())))
+
+        docTypeFilter = Or(doctypeFilterMatcher)
 
         with indexSchema.index.searcher() as searcher:
-            results = searcher.search_page(query, numPage, pagelen=numByPage)
+            results = searcher.search_page(query, numPage, pagelen=numByPage, filter=docTypeFilter)
             print [result["docId"] for result in results]
             return [result["docId"] for result in results]
 

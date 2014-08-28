@@ -40,12 +40,12 @@ def del_indexes(feature):
 def run_server():
 
     sys.path.append("../venv/lib/python2.7/site-packages/")
-    from app import CozyDataSystem
-    app = CozyDataSystem()
+    from app import CozyDataIndexer
+    app = CozyDataIndexer()
     world.server = Server(app)
     try:
         world.server.start()
-        
+
     except KeyboardInterrupt:
         world.server.http.stop()
         tornado.ioloop.IOLoop.instance().stop()

@@ -81,12 +81,16 @@ class SearchHandler(BaseHandler):
         '''
         self.load_json()
         query = self.get_field('query')
-        docType = self.get_field('docType')
+        docTypes = self.get_field('docType', None)
+
+        if isinstance(docTypes, basestring):
+            docTypes = [docTypes]
+
         numPage = self.get_field('numPage', 1)
         numByPage = self.get_field('numByPage', 10)
 
         indexer = Indexer()
-        result = indexer.search_doc(query, docType, numPage, numByPage)
+        result = indexer.search_doc(query, docTypes, numPage, numByPage)
         self.write(json_encode({ 'ids': result }))
 
 
