@@ -81,7 +81,7 @@ class SearchHandler(BaseHandler):
         '''
         self.load_json()
         query = self.get_field('query')
-        docTypes = self.get_field('docType', None)
+        docTypes = self.get_field('docType', [])
 
         if isinstance(docTypes, basestring):
             docTypes = [docTypes]
