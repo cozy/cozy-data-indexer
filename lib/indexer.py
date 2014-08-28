@@ -29,7 +29,7 @@ class IndexSchema():
         self.schema = Schema(content=TEXT(analyzer=analyzer),
                              docType=TEXT,
                              docId=ID(stored=True, unique=True),
-                             tags=KEYWORD)
+                             tags=KEYWORD(lowercase=True, scorable=True))
 
         if not os.path.exists("indexes"):
             os.mkdir("indexes")
@@ -65,6 +65,11 @@ class Indexer():
                 contents.append(data.decode("utf-8"))
 
         content = u" ".join(contents)
+
+        # adds the doctype as a tag
+        tags = doc["tags"].append(docType)
+        tags = u" ".join(doc["tags"][0::1])
+
         writer = indexSchema.index.writer()
         writer.update_document(content=content,
                                docType=unicode(docType),
