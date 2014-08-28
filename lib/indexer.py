@@ -1,6 +1,6 @@
 import os
 
-from whoosh.qparser import QueryParser
+from whoosh.qparser import QueryParser, MultifieldParser
 from whoosh.query import FuzzyTerm, And, Term, Or
 
 from whoosh import index
@@ -11,6 +11,16 @@ from whoosh.analysis import RegexTokenizer
 from whoosh.analysis import CharsetFilter, LowercaseFilter, StopFilter
 
 from lib.stopwords import stoplists
+
+
+class CustomFuzzyTerm(FuzzyTerm):
+    """
+    Custom FuzzyTerm query parser to set a custom maxdist
+    """
+
+    def __init__(self, fieldname, text, boost=1.0, maxdist=1):
+        FuzzyTerm.__init__(self, fieldname, text, 1.0, 2)
+
 
 class IndexSchema():
     """
@@ -85,13 +95,14 @@ class Indexer():
         """
 
         indexSchema = IndexSchema()
-        parser = QueryParser("content", schema=indexSchema.schema,
-                termclass=FuzzyTerm)
+        parser = MultifieldParser(["content", "tags"], schema=indexSchema.schema,
+                termclass=CustomFuzzyTerm)
         query = parser.parse(word)
+        #query = And(query, Term("tags", word.lower()))
 
         doctypeFilterMatcher = []
         for docType in docTypes:
-            doctypeFilterMatcher.append(Term("docType", unicode(docType.lower())))
+            doctypeFilterMatcher.append(FuzzyTerm("docType", unicode(docType.lower()), 1.0, 2))
 
         docTypeFilter = Or(doctypeFilterMatcher)
 
