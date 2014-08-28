@@ -26,9 +26,9 @@ class IndexSchema():
         analyzer = RegexTokenizer() | LowercaseFilter() | \
                    StopFilter(stoplist=stoplist) | chfilter
 
-        self.schema = Schema(content=TEXT(analyzer=analyzer), 
-                             docType=TEXT, 
-                             docId=ID(stored=True, unique=True), 
+        self.schema = Schema(content=TEXT(analyzer=analyzer),
+                             docType=TEXT,
+                             docId=ID(stored=True, unique=True),
                              tags=KEYWORD)
 
         if not os.path.exists("indexes"):
@@ -73,7 +73,7 @@ class Indexer():
         writer.commit()
 
 
-    def search_doc(self, word, docType):
+    def search_doc(self, word, docType, numPage=1, numByPage=10):
         """
         Return a list of docs that contains given word and that matches
         given type.
@@ -86,10 +86,10 @@ class Indexer():
         query = And([query, Term("docType", unicode(docType.lower()))])
 
         with indexSchema.index.searcher() as searcher:
-            results = searcher.search(query)
+            results = searcher.search_page(query, numPage, pagelen=numByPage)
             print [result["docId"] for result in results]
             return [result["docId"] for result in results]
-        
+
 
     def remove_doc(self, id):
         """
