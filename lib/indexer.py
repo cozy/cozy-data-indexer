@@ -98,7 +98,6 @@ class Indexer():
         parser = MultifieldParser(["content", "tags"], schema=indexSchema.schema,
                 termclass=CustomFuzzyTerm)
         query = parser.parse(word)
-        #query = And(query, Term("tags", word.lower()))
 
         doctypeFilterMatcher = []
         for docType in docTypes:
