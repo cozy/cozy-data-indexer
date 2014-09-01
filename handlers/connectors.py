@@ -32,6 +32,9 @@ class BaseBankHandler(BaseHandler):
             self.raise_error("Could not load module: %s" % name)
         except BrowserIncorrectPassword:
             self.raise_error("Wrong credentials")
+        except:
+            self.raise_error("Something went wrong (weboob modules should "
+                             "probably be updated)")
 
         return results
 
