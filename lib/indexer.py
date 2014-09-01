@@ -36,6 +36,8 @@ class IndexSchema():
         analyzer = RegexTokenizer() | LowercaseFilter() | \
                    StopFilter(stoplist=stoplist) | chfilter
 
+        # defines the schema
+        # see http://pythonhosted.org/Whoosh/schema.html for reference
         self.schema = Schema(content=TEXT(analyzer=analyzer),
                              docType=TEXT,
                              docId=ID(stored=True, unique=True),
@@ -66,6 +68,10 @@ class Indexer():
         """
 
         indexSchema = IndexSchema()
+
+        # Since we can't know what fields the document is going to have
+        # we can't use a custom index schema so we put all indexed fields
+        # into one `content` field.
         contents = []
         for field in fields:
             data = doc[field]
@@ -76,7 +82,7 @@ class Indexer():
 
         content = u" ".join(contents)
 
-        # adds the doctype as a tag
+        # Adds the doctype as a tag
         tags = doc["tags"].append(docType)
         tags = u" ".join(doc["tags"][0::1])
 
@@ -95,18 +101,25 @@ class Indexer():
         """
 
         indexSchema = IndexSchema()
+        # Creates the query parser.
+        # MultifieldParser allows search on multiple fields.
+        # We use a custom FuzzyTerm class to set the Levenstein distance to 2
         parser = MultifieldParser(["content", "tags"], schema=indexSchema.schema,
                 termclass=CustomFuzzyTerm)
         query = parser.parse(word)
 
+        # Creates a filter on the doctype field
         doctypeFilterMatcher = []
         for docType in docTypes:
-            doctypeFilterMatcher.append(FuzzyTerm("docType", unicode(docType.lower()), 1.0, 2))
+            term = FuzzyTerm("docType", unicode(docType.lower()), 1.0, 2)
+            doctypeFilterMatcher.append(term)
 
         docTypeFilter = Or(doctypeFilterMatcher)
 
+        # Processes the search (request the index, Whoosh magic)
         with indexSchema.index.searcher() as searcher:
-            results = searcher.search_page(query, numPage, pagelen=numByPage, filter=docTypeFilter)
+            results = searcher.search_page(query, numPage, pagelen=numByPage,
+                                                        filter=docTypeFilter)
             print [result["docId"] for result in results]
             return [result["docId"] for result in results]
 

@@ -83,6 +83,8 @@ class SearchHandler(BaseHandler):
         query = self.get_field('query')
         docTypes = self.get_field('docType', [])
 
+        # For backward compatibility, it accepts a single string
+        # but turn it into an array
         if isinstance(docTypes, basestring):
             docTypes = [docTypes]
 
