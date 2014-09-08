@@ -7,8 +7,8 @@ from lib.indexer import Indexer
 
 def createNote(id, title, content, tags):
     note = dict()
-    note["title"] = title
-    note["content"] = content
+    note["title"] = unicode(title)
+    note["content"] = unicode(content)
     note["id"] = id
     note["tags"] = tags
     return note
@@ -34,21 +34,21 @@ def given_i_create_five_notes_with_tags_and_text(step):
 def and_i_index_them(step):
     world.indexer = Indexer()
     for note in world.notes:
-        world.indexer.index_doc("Note", note, ["title", "content"])
+        world.indexer.index_doc("Note", note, ["title", "content"], {})
 
 @step(u'When I ask for search "([^"]*)"')
 def when_i_ask_for_search_group1(step, word):
-    world.ids = world.indexer.search_doc(unicode(word), ["Note"])
+    results = world.indexer.search_doc(unicode(word), ["Note"])
+    world.resultsID = results['resultsID']
 
 @step(u'It returns me notes? "([^"]*)" about "([^"]*)"')
 def it_returns_me_note_the_note_about_group1(step, expectedIDs, group1):
 
     expectedIDs = expectedIDs.split(',')
-
-    assert_equals(len(world.ids), len(expectedIDs))
+    assert_equals(len(world.resultsID), len(expectedIDs))
 
     for expectedID in expectedIDs:
-        assert unicode(expectedID), world.ids
+        assert unicode(expectedID), world.resultsID
 
 
 
@@ -58,4 +58,4 @@ def given_i_remove_the_note_about_group1(step, group1):
 
 @step(u'Then It returns nothing')
 def then_it_returns_nothing(step):
-    assert_equals(len(world.ids), 0)
+    assert_equals(len(world.resultsID), 0)
