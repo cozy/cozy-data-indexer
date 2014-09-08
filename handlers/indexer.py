@@ -88,8 +88,8 @@ class SearchHandler(BaseHandler):
         if isinstance(docTypes, basestring):
             docTypes = [docTypes]
 
-        numPage = self.get_field('numPage', 1)
-        numByPage = self.get_field('numByPage', 10)
+        numPage = int(self.get_field('numPage', 1))
+        numByPage = int(self.get_field('numByPage', 10))
 
         indexer = Indexer()
         result = indexer.search_doc(query, docTypes, numPage, numByPage)
