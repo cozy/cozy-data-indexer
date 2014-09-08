@@ -1,10 +1,16 @@
 import os
 
+from datetime import datetime
+import re
+import json
+from dateutil.parser import parse as stringToDate
+from distutils.util import strtobool
+
 from whoosh.qparser import QueryParser, MultifieldParser
 from whoosh.query import FuzzyTerm, And, Term, Or
 
 from whoosh import index
-from whoosh.fields import Schema, ID, KEYWORD, TEXT
+from whoosh.fields import Schema, ID, KEYWORD, TEXT, DATETIME, NUMERIC, BOOLEAN
 
 from whoosh.support.charset import accent_map
 from whoosh.analysis import RegexTokenizer
@@ -38,16 +44,59 @@ class IndexSchema():
 
         # defines the schema
         # see http://pythonhosted.org/Whoosh/schema.html for reference
+        keywordType = KEYWORD(lowercase=True, scorable=True)
         self.schema = Schema(content=TEXT(analyzer=analyzer),
                              docType=TEXT,
                              docId=ID(stored=True, unique=True),
-                             tags=KEYWORD(lowercase=True, scorable=True))
+                             tags=keywordType)
 
+        # Adds dynamic fields so each documents can index its fields in the
+        # same Whoosh index
+        self.schema.add('*_text', TEXT(analyzer=analyzer), glob=True)
+        self.schema.add('*_date', DATETIME, glob=True)
+        self.schema.add('*_numeric', NUMERIC, glob=True)
+        self.schema.add('*_keyword', keywordType, glob=True)
+        self.schema.add('*_boolean', BOOLEAN, glob=True)
+
+        # Creates the index folder and Whoosh index files if it doesn't exist
+        # And loads the index in any case
         if not os.path.exists("indexes"):
             os.mkdir("indexes")
             self.index = index.create_in("indexes", self.schema)
         else:
             self.index = index.open_dir("indexes")
+
+        # Creates the doctypes folder if it doesn't exist
+        if not os.path.exists("doctypes"):
+            os.mkdir("doctypes")
+
+        # Creates the doctypes default schema file if it doesn't exist
+        if not os.path.exists('doctypes/doctypes_schema.json'):
+            with open('doctypes/doctypes_schema.json', 'w') as defaultFile:
+                defaultFile.write("{}")
+
+        '''
+        Loads the doctypes schema if it's valid, otherwise recreates it
+        Doctypes schema is a dictionary of doctypes with their fields created
+        and updated when a document is indexed.
+        That way, we can tell Whoosh which fields to search by default, because
+        there is apparently no way to say "search in all fields".
+        '''
+        with open('doctypes/doctypes_schema.json', 'r+') as rawJSON:
+            try:
+                self.doctypesSchema = json.load(rawJSON)
+            except ValueError:
+                rawJSON.write("{}")
+                self.doctypesSchema = {}
+
+    def update_doctypes_schema(self, schemaToUpdate):
+        """
+        Updates and persists the doctypes schema in its file
+        """
+        self.doctypesSchema.update(schemaToUpdate)
+
+        with open('doctypes/doctypes_schema.json', 'w') as fileObject:
+            fileObject.write(json.dumps(self.doctypesSchema))
 
 
     def clear_index(self):
@@ -59,8 +108,58 @@ class IndexSchema():
         if os.path.exists("indexes"):
             index.create_in("indexes", self.schema)
 
+        if os.path.exists("doctypes"):
+            with open('doctypes/doctypes_schema.json', 'w') as defaultFile:
+                defaultFile.write("{}")
+
 
 class Indexer():
+
+    def get_field_type(self, data):
+        """"
+        Determines the field type based on the field name (convention)
+        """
+
+        isText = re.compile(".+_text$")
+        isNumeric = re.compile(".+_numeric$")
+        isDate = re.compile(".+_date$")
+        isKeyword = re.compile(".+_keyword$")
+        isBoolean = re.compile(".+_boolean$")
+
+        # First we try to detect field type based on name convention
+        if isText.match(data):
+            return "text"
+        elif isNumeric.match(data):
+            return "numeric"
+        elif isDate.match(data):
+            return "date"
+        elif isKeyword.match(data):
+            return "listOfString"
+        elif isBoolean.match(data):
+            return "boolean"
+
+        # To ensure backwards compatibility, we have a default type that
+        # will be interepreted like "do the previous version way"
+        else:
+            return "default"
+
+
+    def get_formatted_data(self, fieldType, data):
+        """
+        Converts the data from string to the relevant type
+        """
+
+        if fieldType == "text":
+            return data.decode("utf-8")
+        elif fieldType == "numeric":
+            return float(data)
+        elif fieldType == "date":
+            return stringToDate(data)
+        elif fieldType == "listOfString":
+            return u" ".join(data)
+        elif fieldType == "boolean":
+            return strtobool(data)
+
 
     def index_doc(self, docType, doc, fields):
         """
@@ -69,29 +168,73 @@ class Indexer():
 
         indexSchema = IndexSchema()
 
-        # Since we can't know what fields the document is going to have
-        # we can't use a custom index schema so we put all indexed fields
-        # into one `content` field.
-        contents = []
-        for field in fields:
-            data = doc[field]
-            if isinstance(data, unicode):
-                contents.append(data)
-            elif data is not None:
-                contents.append(data.decode("utf-8"))
+        # The document that will be indexed
+        indexedDoc = {}
 
-        content = u" ".join(contents)
+        # Support for old way of indexing
+        contents = []
+
+        # caching the result to avoid calling it from the loop
+        fieldsInDoc = doc.keys()
+
+        # the fields that the indexer will store as schema of the doctype
+        fieldsInSchema = []
+
+        # Normalize docType
+        docType = unicode(docType.lower())
+
+        # Extracts and formats every doc field to be indexed
+        for field in fields:
+
+            # Process the field only if it exists and if it's not a special one
+            if field in fieldsInDoc and field not in ['id', 'docType', 'tags']:
+
+                data = doc[field]
+
+                # Field type is needed to convert the data into the proper type
+                # from string
+                fieldType = self.get_field_type(field)
+
+                # To ensure backwards compatibility, we use a "default"
+                # field tye that act like previous version (putting everything
+                # in a field)
+                if fieldType == "default":
+                    print "[WARNING] Field %s is going to be indexed the " \
+                              "old way" % field
+
+                    # Only strings are supported in BC mode
+                    if isinstance(data, basestring):
+                        contents.append(data.decode("utf-8"))
+                    else:
+                        print "[WARNING] Data type not supported for %s" % data
+                else:
+                    fieldsInSchema.append(field.lower())
+                    indexedDoc[field] = self.get_formatted_data(fieldType, data)
+
+            # Handles error cases
+            elif field not in fieldsInDoc:
+                print "[WARNING] Cannot found field %s in document" % field
+            else:
+                print "[WARNING] Field %s is automatically indexed" % field
 
         # Adds the doctype as a tag
         tags = doc["tags"].append(docType)
         tags = u" ".join(doc["tags"][0::1])
 
+        # Adds special fields
+        indexedDoc["docId"] = doc["id"]
+        indexedDoc["tags"] = tags
+        indexedDoc["docType"] = docType
+        indexedDoc["content"] = u" ".join(contents)
+
+        print "About to index %s" % indexedDoc.keys()
         writer = indexSchema.index.writer()
-        writer.update_document(content=content,
-                               docType=unicode(docType),
-                               docId=unicode(doc["id"]),
-                               tags=doc["tags"])
+        writer.update_document(**indexedDoc)
         writer.commit()
+
+        print "Update schema for doctype %s with %s" % (docType, fieldsInSchema)
+        schemaToUpdate = {docType: fieldsInSchema}
+        indexSchema.update_doctypes_schema(schemaToUpdate)
 
 
     def search_doc(self, word, docTypes, numPage=1, numByPage=10):
@@ -101,10 +244,25 @@ class Indexer():
         """
 
         indexSchema = IndexSchema()
+
+        # Retrieves the fields to search from the doctypes schema
+        fieldsToSearch = []
+        for docType in docTypes:
+            docType = docType.lower()
+            try:
+                schema = indexSchema.doctypesSchema[docType]
+                fieldsToSearch = fieldsToSearch + schema
+            except:
+                print "[WARNING] schema not found for %s" % docType
+
+        # By default we search "content" (for BC) and "tags"
+        fields = ['content', 'tags'] + fieldsToSearch
+        print "Search will be performed on fields %s" % fields
+
         # Creates the query parser.
         # MultifieldParser allows search on multiple fields.
         # We use a custom FuzzyTerm class to set the Levenstein distance to 2
-        parser = MultifieldParser(["content", "tags"], schema=indexSchema.schema,
+        parser = MultifieldParser(fields, schema=indexSchema.schema,
                 termclass=CustomFuzzyTerm)
         query = parser.parse(word)
 
@@ -120,8 +278,10 @@ class Indexer():
         with indexSchema.index.searcher() as searcher:
             results = searcher.search_page(query, numPage, pagelen=numByPage,
                                                         filter=docTypeFilter)
-            print [result["docId"] for result in results]
-            return [result["docId"] for result in results]
+
+            resultsID = [result["docId"] for result in results]
+            print "Results: %s" % resultsID
+            return resultsID
 
 
     def remove_doc(self, id):

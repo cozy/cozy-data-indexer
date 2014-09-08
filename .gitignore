@@ -4,3 +4,5 @@ venv
 virtualenv
 lettuce*
 indexes
+doctypes
+.DS_STORE
