@@ -34,6 +34,7 @@ class IndexHandler(BaseHandler):
         self.load_json()
         doc = self.get_field("doc")
         fields = self.get_field("fields")
+        fieldsType = self.get_field('fieldsType', {})
 
         if not "id" in doc:
             id = doc.get("_id", None)
@@ -51,7 +52,7 @@ class IndexHandler(BaseHandler):
             self.raise_argument_error("fields")
         else:
             indexer = Indexer()
-            indexer.index_doc(docType, doc, fields)
+            indexer.index_doc(docType, doc, fields, fieldsType)
             self.write("indexation succeeds")
 
     def delete(self, id):

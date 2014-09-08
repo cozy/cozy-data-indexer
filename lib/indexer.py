@@ -52,10 +52,9 @@ class IndexSchema():
 
         # Adds dynamic fields so each documents can index its fields in the
         # same Whoosh index
-        self.schema.add('*_text', TEXT(analyzer=analyzer), glob=True)
+        self.schema.add('*_string', TEXT(analyzer=analyzer), glob=True)
         self.schema.add('*_date', DATETIME, glob=True)
-        self.schema.add('*_numeric', NUMERIC, glob=True)
-        self.schema.add('*_keyword', keywordType, glob=True)
+        self.schema.add('*_number', NUMERIC, glob=True)
         self.schema.add('*_boolean', BOOLEAN, glob=True)
 
         # Creates the index folder and Whoosh index files if it doesn't exist
@@ -115,28 +114,17 @@ class IndexSchema():
 
 class Indexer():
 
-    def get_field_type(self, data):
+    def get_field_type(self, field, fieldsType):
         """"
         Determines the field type based on the field name (convention)
         """
 
-        isText = re.compile(".+_text$")
-        isNumeric = re.compile(".+_numeric$")
-        isDate = re.compile(".+_date$")
-        isKeyword = re.compile(".+_keyword$")
-        isBoolean = re.compile(".+_boolean$")
+        supportedTypes = ['string', 'number', 'date', 'boolean']
 
-        # First we try to detect field type based on name convention
-        if isText.match(data):
-            return "text"
-        elif isNumeric.match(data):
-            return "numeric"
-        elif isDate.match(data):
-            return "date"
-        elif isKeyword.match(data):
-            return "listOfString"
-        elif isBoolean.match(data):
-            return "boolean"
+        # Checks if the field type has been passed
+        fieldType = fieldsType.get(field, None)
+        if fieldType is not None and fieldType in supportedTypes:
+            return fieldType
 
         # To ensure backwards compatibility, we have a default type that
         # will be interepreted like "do the previous version way"
@@ -144,24 +132,30 @@ class Indexer():
             return "default"
 
 
-    def get_formatted_data(self, fieldType, data):
+    def get_typed_field_name(self, field, fieldType):
+        """
+        Returns the field name with its Whoosh type appended
+        """
+
+        return "%s_%s" % (field, fieldType)
+
+
+    def get_formatted_data(self, data, fieldType):
         """
         Converts the data from string to the relevant type
         """
 
-        if fieldType == "text":
+        if fieldType == 'string':
             return data.decode("utf-8")
-        elif fieldType == "numeric":
+        elif fieldType == 'number':
             return float(data)
-        elif fieldType == "date":
+        elif fieldType == 'date':
             return stringToDate(data)
-        elif fieldType == "listOfString":
-            return u" ".join(data)
-        elif fieldType == "boolean":
+        elif fieldType == 'boolean':
             return strtobool(data)
 
 
-    def index_doc(self, docType, doc, fields):
+    def index_doc(self, docType, doc, fields, fieldsType):
         """
         Add given doc to index, tag and given fields are stored.
         """
@@ -193,7 +187,7 @@ class Indexer():
 
                 # Field type is needed to convert the data into the proper type
                 # from string
-                fieldType = self.get_field_type(field)
+                fieldType = self.get_field_type(field, fieldsType)
 
                 # To ensure backwards compatibility, we use a "default"
                 # field tye that act like previous version (putting everything
@@ -206,10 +200,13 @@ class Indexer():
                     if isinstance(data, basestring):
                         contents.append(data.decode("utf-8"))
                     else:
-                        print "[WARNING] Data type not supported for %s" % data
+                        print "[WARNING] Data type not supported for field " \
+                              "%s (%s)" % (field, data)
                 else:
                     fieldsInSchema.append(field.lower())
-                    indexedDoc[field] = self.get_formatted_data(fieldType, data)
+                    typedFieldName = self.get_typed_field_name(field, fieldType)
+                    indexedDoc[typedFieldName] = self.get_formatted_data(data, \
+                                                                    fieldType)
 
             # Handles error cases
             elif field not in fieldsInDoc:
