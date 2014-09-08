@@ -237,7 +237,8 @@ class Indexer():
         indexSchema.update_doctypes_schema(schemaToUpdate)
 
 
-    def search_doc(self, word, docTypes, numPage=1, numByPage=10):
+    def search_doc(self, word, docTypes, numPage=1, numByPage=10,
+                                                        showNumResults=False):
         """
         Return a list of docs that contains given word and that matches
         given type.
@@ -281,7 +282,12 @@ class Indexer():
 
             resultsID = [result["docId"] for result in results]
             print "Results: %s" % resultsID
-            return resultsID
+
+            # Ensures BC if the number of results is not requested
+            if showNumResults:
+                return {'resultsID': resultsID, 'numResults': len(results)}
+            else:
+                return {'resultsID': resultsID}
 
 
     def remove_doc(self, id):

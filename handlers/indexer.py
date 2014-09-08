@@ -90,10 +90,12 @@ class SearchHandler(BaseHandler):
 
         numPage = int(self.get_field('numPage', 1))
         numByPage = int(self.get_field('numByPage', 10))
+        showNumResults = self.get_field('showNumResults', False)
 
         indexer = Indexer()
-        result = indexer.search_doc(query, docTypes, numPage, numByPage)
-        self.write(json_encode({ 'ids': result }))
+        result = indexer.search_doc(query, docTypes, numPage, numByPage,
+                                    showNumResults)
+        self.write(json_encode(result))
 
 
 class ClearHandler(BaseHandler):
