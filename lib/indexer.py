@@ -222,7 +222,7 @@ class Indexer():
         tags = u" ".join(doc["tags"][0::1])
 
         # Adds special fields
-        indexedDoc["docId"] = doc["id"]
+        indexedDoc["docId"] = unicode(doc["id"])
         indexedDoc["tags"] = tags
         indexedDoc["docType"] = docType
         indexedDoc["content"] = u" ".join(contents)
