@@ -137,7 +137,8 @@ class Indexer():
         Returns the field name with its Whoosh type appended
         """
 
-        return "%s_%s" % (field, fieldType)
+        typedFieldName = "%s_%s" % (field, fieldType)
+        return typedFieldName.lower()
 
 
     def get_formatted_data(self, data, fieldType):
@@ -178,6 +179,7 @@ class Indexer():
         docType = unicode(docType.lower())
 
         # Extracts and formats every doc field to be indexed
+        print fields
         for field in fields:
 
             # Process the field only if it exists and if it's not a special one
@@ -203,8 +205,8 @@ class Indexer():
                         print "[WARNING] Data type not supported for field " \
                               "%s (%s)" % (field, data)
                 else:
-                    fieldsInSchema.append(field.lower())
                     typedFieldName = self.get_typed_field_name(field, fieldType)
+                    fieldsInSchema.append(typedFieldName)
                     indexedDoc[typedFieldName] = self.get_formatted_data(data, \
                                                                     fieldType)
 
