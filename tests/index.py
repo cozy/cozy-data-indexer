@@ -39,7 +39,7 @@ def and_i_index_them(step):
 @step(u'When I ask for search "([^"]*)"')
 def when_i_ask_for_search_group1(step, word):
     results = world.indexer.search_doc(unicode(word), ["Note"])
-    world.resultsID = results['resultsID']
+    world.resultsID = results['ids']
 
 @step(u'It returns me notes? "([^"]*)" about "([^"]*)"')
 def it_returns_me_note_the_note_about_group1(step, expectedIDs, group1):

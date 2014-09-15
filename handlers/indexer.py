@@ -24,6 +24,7 @@ class IndexHandler(BaseHandler):
 
     * doc: a document with an id and a docType
     * fields: fields to index
+    * fields type: list of types for each field
     '''
 
     def post(self):
@@ -74,6 +75,9 @@ class SearchHandler(BaseHandler):
 
     * query: the search query string
     * docType: the type of document to look for
+    * numPage: number of the page to show
+    * numByPage: number of results on a page
+    * showNumResults: if true, will return the number of matched results
     '''
 
     def post(self):

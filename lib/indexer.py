@@ -18,6 +18,9 @@ from whoosh.analysis import CharsetFilter, LowercaseFilter, StopFilter
 
 from lib.stopwords import stoplists
 
+import logging
+logger = logging.getLogger('cozy-data-indexer.' + __name__)
+
 
 class CustomFuzzyTerm(FuzzyTerm):
     """
@@ -179,7 +182,6 @@ class Indexer():
         docType = unicode(docType.lower())
 
         # Extracts and formats every doc field to be indexed
-        print fields
         for field in fields:
 
             # Process the field only if it exists and if it's not a special one
@@ -195,15 +197,15 @@ class Indexer():
                 # field tye that act like previous version (putting everything
                 # in a field)
                 if fieldType == "default":
-                    print "[WARNING] Field %s is going to be indexed the " \
-                              "old way" % field
+                    logger.warning("Field %s is going to be indexed the " \
+                              "old way" % field)
 
                     # Only strings are supported in BC mode
                     if isinstance(data, basestring):
                         contents.append(data.decode("utf-8"))
                     else:
-                        print "[WARNING] Data type not supported for field " \
-                              "%s (%s)" % (field, data)
+                        logger.warning("Data type not supported for field " \
+                              "%s (%s)" % (field, data))
                 else:
                     typedFieldName = self.get_typed_field_name(field, fieldType)
                     fieldsInSchema.append(typedFieldName)
@@ -212,9 +214,9 @@ class Indexer():
 
             # Handles error cases
             elif field not in fieldsInDoc:
-                print "[WARNING] Cannot found field %s in document" % field
+                logger.warning("Cannot found field %s in document" % field)
             else:
-                print "[WARNING] Field %s is automatically indexed" % field
+                logger.warning("Field %s is automatically indexed" % field)
 
         # Adds the doctype as a tag
         tags = doc["tags"].append(docType)
@@ -226,12 +228,13 @@ class Indexer():
         indexedDoc["docType"] = docType
         indexedDoc["content"] = u" ".join(contents)
 
-        print "About to index %s" % indexedDoc.keys()
+        logger.info("About to index %s" % indexedDoc.keys())
         writer = indexSchema.index.writer()
         writer.update_document(**indexedDoc)
         writer.commit()
 
-        print "Update schema for doctype %s with %s" % (docType, fieldsInSchema)
+        logger.info("Update schema for doctype %s with %s" \
+                                                    % (docType, fieldsInSchema))
         schemaToUpdate = {docType: fieldsInSchema}
         indexSchema.update_doctypes_schema(schemaToUpdate)
 
@@ -253,11 +256,11 @@ class Indexer():
                 schema = indexSchema.doctypesSchema[docType]
                 fieldsToSearch = fieldsToSearch + schema
             except:
-                print "[WARNING] schema not found for %s" % docType
+                logger.warning("Schema not found for %s" % docType)
 
         # By default we search "content" (for BC) and "tags"
         fields = ['content', 'tags'] + fieldsToSearch
-        print "Search will be performed on fields %s" % fields
+        logger.info("Search will be performed on fields %s" % fields)
 
         # Creates the query parser.
         # MultifieldParser allows search on multiple fields.
@@ -280,13 +283,13 @@ class Indexer():
                                                         filter=docTypeFilter)
 
             resultsID = [result["docId"] for result in results]
-            print "Results: %s" % resultsID
+            logger.info("Results: %s" % resultsID)
 
             # Ensures BC if the number of results is not requested
             if showNumResults:
-                return {'resultsID': resultsID, 'numResults': len(results)}
+                return {'ids': resultsID, 'numResults': len(results)}
             else:
-                return {'resultsID': resultsID}
+                return {'ids': resultsID}
 
 
     def remove_doc(self, id):
