@@ -202,7 +202,7 @@ class Indexer():
 
                     # Only strings are supported in BC mode
                     if isinstance(data, basestring):
-                        contents.append(data.decode("utf-8"))
+                        contents.append(data)
                     else:
                         logger.warning("Data type not supported for field " \
                               "%s (%s)" % (field, data))

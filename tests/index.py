@@ -7,8 +7,8 @@ from lib.indexer import Indexer
 
 def createNote(id, title, content, tags):
     note = dict()
-    note["title"] = unicode(title)
-    note["content"] = unicode(content)
+    note["title"] = title.decode('utf-8')
+    note["content"] = content.decode('utf-8')
     note["id"] = id
     note["tags"] = tags
     return note
