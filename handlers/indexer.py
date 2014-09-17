@@ -24,6 +24,7 @@ class IndexHandler(BaseHandler):
 
     * doc: a document with an id and a docType
     * fields: fields to index
+    * fields type: list of types for each field
     '''
 
     def post(self):
@@ -34,6 +35,7 @@ class IndexHandler(BaseHandler):
         self.load_json()
         doc = self.get_field("doc")
         fields = self.get_field("fields")
+        fieldsType = self.get_field('fieldsType', {})
 
         if not "id" in doc:
             id = doc.get("_id", None)
@@ -51,7 +53,7 @@ class IndexHandler(BaseHandler):
             self.raise_argument_error("fields")
         else:
             indexer = Indexer()
-            indexer.index_doc(docType, doc, fields)
+            indexer.index_doc(docType, doc, fields, fieldsType)
             self.write("indexation succeeds")
 
     def delete(self, id):
@@ -73,6 +75,9 @@ class SearchHandler(BaseHandler):
 
     * query: the search query string
     * docType: the type of document to look for
+    * numPage: number of the page to show
+    * numByPage: number of results on a page
+    * showNumResults: if true, will return the number of matched results
     '''
 
     def post(self):
@@ -88,12 +93,14 @@ class SearchHandler(BaseHandler):
         if isinstance(docTypes, basestring):
             docTypes = [docTypes]
 
-        numPage = self.get_field('numPage', 1)
-        numByPage = self.get_field('numByPage', 10)
+        numPage = int(self.get_field('numPage', 1))
+        numByPage = int(self.get_field('numByPage', 10))
+        showNumResults = self.get_field('showNumResults', False)
 
         indexer = Indexer()
-        result = indexer.search_doc(query, docTypes, numPage, numByPage)
-        self.write(json_encode({ 'ids': result }))
+        result = indexer.search_doc(query, docTypes, numPage, numByPage,
+                                    showNumResults)
+        self.write(json_encode(result))
 
 
 class ClearHandler(BaseHandler):
