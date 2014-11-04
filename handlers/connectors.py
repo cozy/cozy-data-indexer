@@ -1,7 +1,7 @@
 import logging
 
 from weboob.core.modules import ModuleLoadError
-from weboob.tools.browser import BrowserIncorrectPassword
+from weboob.exceptions import BrowserIncorrectPassword
 
 from handlers.base import BaseHandler
 from lib.connector import Connector
