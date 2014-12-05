@@ -8,7 +8,7 @@ Cloud Platform. It is based on
 
 Get build dependencies
 
-    sudo apt-get install python python-pip python-dev lxml2-dev libxslt1-dev
+    sudo apt-get install python python-pip python-dev libxml2-dev libxslt1-dev
 
 Setup your virtual environment:
 
