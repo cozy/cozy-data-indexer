@@ -20,11 +20,13 @@ class BaseBankHandler(BaseHandler):
         Supported method: get_accounts and get_history.
         '''
         self.load_json()
-        login = self.get_field("login")
-        password = self.get_field("password")
+        params_connector = { 'login': self.get_field("login"), 'password': self.get_field("password") }
+        website = self.get_field("website")
+        if website:
+          params_connector['website'] = website
 
         try:
-            connector = Connector(name, {'login': login, 'password': password})
+            connector = Connector(name, params_connector)
             results = {}
             callback = getattr(connector, method_name)
             results[name] = callback()
