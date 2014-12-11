@@ -23,7 +23,7 @@ class BaseBankHandler(BaseHandler):
         params_connector = { 'login': self.get_field("login"), 'password': self.get_field("password") }
         website = self.get_field("website")
         if website:
-          params_connector['website'] = website
+            params_connector['website'] = website
 
         try:
             connector = Connector(name, params_connector)
