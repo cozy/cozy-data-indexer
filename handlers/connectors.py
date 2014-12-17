@@ -18,12 +18,23 @@ class BaseBankHandler(BaseHandler):
         '''
         Load given connector (name) and apply the given method on it.
         Supported method: get_accounts and get_history.
+
+        Expected fields:
+
+        * login
+        * password
+        * website (optional)
         '''
         self.load_json()
-        params_connector = { 'login': self.get_field("login"), 'password': self.get_field("password") }
-        website = self.get_field("website")
-        if website:
-            params_connector['website'] = website
+        params_connector = {
+            'login': self.get_field("login"),
+            'password': self.get_field("password")
+        }
+
+        if "website" in self.request.arguments:
+            website = self.get_field("website")
+            if website:
+                params_connector['website'] = website
 
         try:
             connector = Connector(name, params_connector)
@@ -56,6 +67,7 @@ class BankHandler(BaseBankHandler):
 
         self.return_json(self.load_from_connector(name, 'get_balances'))
 
+
 class BankHistoryHandler(BaseBankHandler):
     """
     This handler is dedicated to retrieve transaction history of bank accounts.
@@ -70,4 +82,3 @@ class BankHistoryHandler(BaseBankHandler):
         For available bank type check: http://weboob.org/modules
         """
         self.return_json(self.load_from_connector(name, 'get_history'))
-
