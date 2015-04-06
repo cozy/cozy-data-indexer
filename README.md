@@ -19,7 +19,6 @@ Setup your virtual environment:
 Install dependencies:
 
     pip install -r requirements/common.txt
-    pip install -r requirements/production.txt
 
 Start the server:
 
