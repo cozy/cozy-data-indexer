@@ -4,6 +4,7 @@ import logging
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
+import os
 from tornado.options import options
 
 from app import CozyDataIndexer
@@ -15,7 +16,7 @@ def main():
     logger.info("Cozy Data Indexer started on port %d." % options.port)
     try:
         http_server = tornado.httpserver.HTTPServer(app)
-        http_server.listen(options.port, address="127.0.0.1")
+        http_server.listen(options.port, address=os.getenv('HOST', '127.0.0.1'))
         tornado.ioloop.IOLoop.instance().start()
 
     except KeyboardInterrupt:
