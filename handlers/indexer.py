@@ -2,6 +2,7 @@ from tornado.escape import json_encode
 
 from handlers.base import BaseHandler
 from lib.indexer import Indexer
+from lib.version import VERSION
 
 import logging
 logger = logging.getLogger('cozy-data-indexer.' + __name__)
@@ -13,7 +14,7 @@ class VersionHandler(BaseHandler):
     '''
 
     def get(self):
-        self.write("Cozy Data Indexer v1.0.0")
+        self.write("Cozy Data Indexer v{}".format(VERSION))
 
 
 class IndexHandler(BaseHandler):
