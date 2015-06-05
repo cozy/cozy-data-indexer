@@ -41,7 +41,8 @@ class BaseHandler(tornado.web.RequestHandler):
             if default is self._ARG_DEFAULT:
                 self.raise_argument_error(name)
             logger.debug("Returning default argument %s, as we couldn't find "
-                    "'%s' in %s" % (default, name, self.request.arguments))
+                         "'%s' in %s" % (default, name,
+                                         self.request.arguments))
             return default
 
         arg = self.request.arguments[name]
@@ -53,7 +54,7 @@ class BaseHandler(tornado.web.RequestHandler):
         Raise a 400 error telling user that an argument is missing.
         """
         self.raise_error("Missing argument '%s'" % name)
-    
+
     def raise_error(self, msg, status_code=400):
         """
         Raise a 400 error telling user and loggin given msg.

@@ -1,8 +1,8 @@
 import tornado
-import os
 
 from settings import settings
 from urls import url_patterns
+
 
 class CozyDataIndexer(tornado.web.Application):
     def __init__(self):

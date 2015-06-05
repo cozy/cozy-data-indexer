@@ -36,6 +36,7 @@ def del_indexes(feature):
     if os.path.exists("indexes"):
         shutil.rmtree("indexes")
 
+
 @before.all
 def run_server():
 
@@ -50,6 +51,7 @@ def run_server():
         world.server.http.stop()
         tornado.ioloop.IOLoop.instance().stop()
 
+
 @after.all
 def kill_server(total):
     logger = logging.getLogger("")
@@ -59,4 +61,3 @@ def kill_server(total):
     world.server.http.stop()
     tornado.ioloop.IOLoop.instance().stop()
     sys.exit()
-
