@@ -1,0 +1,14 @@
+Source: cozy-indexer
+Section: cozy
+Priority: optional
+Maintainer: Nicolas Ledez <nicolas@cozycloud.cc>
+Build-Depends: debhelper (>= 9)
+Standards-Version: 3.9.5
+Homepage: https://github.com/cozy/cozy-data-indexer
+Vcs-Git: https://github.com/cozy/cozy-data-indexer.git
+
+Package: cozy-indexer
+Architecture: all
+Depends: ${misc:Depends}, python-dateutil, python-whoosh, python-tornado
+Description: <insert up to 60 chars description>
+ <insert long description, indented with spaces>

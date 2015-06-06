@@ -9,3 +9,4 @@ Cozy_data_indexer.egg-info/
 build/
 dist/
 cozy_indexer.egg-info/
+debian/cozy-indexer
