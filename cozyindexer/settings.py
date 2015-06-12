@@ -11,6 +11,7 @@ define("static_path", default=None)
 define("with_xunit", default=None)
 tornado.options.parse_command_line()
 
+
 class DeploymentType:
     PRODUCTION = "PRODUCTION"
     DEV = "DEV"
@@ -33,4 +34,3 @@ settings['debug'] = DEPLOYMENT != DeploymentType.PRODUCTION or options.debug
 
 if options.config:
     tornado.options.parse_config_file(options.config)
-

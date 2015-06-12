@@ -1,28 +1,13 @@
 #!/usr/bin/env python
-import logging
-
-import tornado.httpserver
-import tornado.ioloop
-import tornado.web
 import os
-from tornado.options import options
+import sys
 
-from app import CozyDataIndexer
+current_directory = os.path.dirname(os.path.realpath(__file__))
+sys.path.remove(current_directory)
+sys.path.insert(0, os.path.join(current_directory, 'cozyindexer'))
 
-app = CozyDataIndexer()
+from server import main
 
-def main():
-    logger = logging.getLogger("")
-    logger.info("Cozy Data Indexer started on port %d." % options.port)
-    try:
-        http_server = tornado.httpserver.HTTPServer(app)
-        http_server.listen(options.port, address=os.getenv('HOST', '127.0.0.1'))
-        tornado.ioloop.IOLoop.instance().start()
-
-    except KeyboardInterrupt:
-        tornado.ioloop.IOLoop.instance().stop()
-        print ""
-        logger.info("Cozy Data Indexer stopped.")
 
 if __name__ == "__main__":
     main()

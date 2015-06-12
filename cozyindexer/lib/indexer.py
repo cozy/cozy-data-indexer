@@ -1,13 +1,11 @@
 import os
 
-from datetime import datetime
-import re
 import json
 from dateutil.parser import parse as stringToDate
 from distutils.util import strtobool
 
-from whoosh.qparser import QueryParser, MultifieldParser
-from whoosh.query import FuzzyTerm, And, Term, Or
+from whoosh.qparser import MultifieldParser
+from whoosh.query import FuzzyTerm, Or
 
 from whoosh import index
 from whoosh.fields import Schema, ID, KEYWORD, TEXT, DATETIME, NUMERIC, BOOLEAN
@@ -43,7 +41,7 @@ class IndexSchema():
         chfilter = CharsetFilter(accent_map)
         stoplist = stoplists["en"].union(stoplists["fr"])
         analyzer = RegexTokenizer() | LowercaseFilter() | \
-                   StopFilter(stoplist=stoplist) | chfilter
+            StopFilter(stoplist=stoplist) | chfilter
 
         # defines the schema
         # see http://pythonhosted.org/Whoosh/schema.html for reference
@@ -100,7 +98,6 @@ class IndexSchema():
         with open('doctypes/doctypes_schema.json', 'w') as fileObject:
             fileObject.write(json.dumps(self.doctypesSchema))
 
-
     def clear_index(self):
         """
         Clear index: whoosh indexe create, create a new index in the directory
@@ -134,7 +131,6 @@ class Indexer():
         else:
             return "default"
 
-
     def get_typed_field_name(self, field, fieldType):
         """
         Returns the field name with its Whoosh type appended
@@ -142,7 +138,6 @@ class Indexer():
 
         typedFieldName = "%s_%s" % (field, fieldType)
         return typedFieldName.lower()
-
 
     def get_formatted_data(self, data, fieldType):
         """
@@ -157,7 +152,6 @@ class Indexer():
             return stringToDate(data)
         elif fieldType == 'boolean':
             return strtobool(data)
-
 
     def index_doc(self, docType, doc, fields, fieldsType):
         """
@@ -197,20 +191,22 @@ class Indexer():
                 # field tye that act like previous version (putting everything
                 # in a field)
                 if fieldType == "default":
-                    logger.warning("Field %s is going to be indexed the " \
-                              "old way" % field)
+                    logger.warning("Field %s is going to be indexed the "
+                                   "old way" % field)
 
                     # Only strings are supported in BC mode
                     if isinstance(data, basestring):
                         contents.append(data)
                     else:
-                        logger.warning("Data type not supported for field " \
-                              "%s (%s)" % (field, data))
+                        logger.warning("Data type not supported for field "
+                                       "%s (%s)" % (field, data))
                 else:
-                    typedFieldName = self.get_typed_field_name(field, fieldType)
+                    typedFieldName = self.get_typed_field_name(field,
+                                                               fieldType)
                     fieldsInSchema.append(typedFieldName)
-                    indexedDoc[typedFieldName] = self.get_formatted_data(data, \
-                                                                    fieldType)
+                    indexedDoc[typedFieldName] = \
+                        self.get_formatted_data(data,
+                                                fieldType)
 
             # Handles error cases
             elif field not in fieldsInDoc:
@@ -233,14 +229,13 @@ class Indexer():
         writer.update_document(**indexedDoc)
         writer.commit()
 
-        logger.info("Update schema for doctype %s with %s" \
-                                                    % (docType, fieldsInSchema))
+        logger.info("Update schema for doctype %s with %s"
+                    % (docType, fieldsInSchema))
         schemaToUpdate = {docType: fieldsInSchema}
         indexSchema.update_doctypes_schema(schemaToUpdate)
 
-
     def search_doc(self, word, docTypes, numPage=1, numByPage=10,
-                                                        showNumResults=False):
+                   showNumResults=False):
         """
         Return a list of docs that contains given word and that matches
         given type.
@@ -266,7 +261,7 @@ class Indexer():
         # MultifieldParser allows search on multiple fields.
         # We use a custom FuzzyTerm class to set the Levenstein distance to 2
         parser = MultifieldParser(fields, schema=indexSchema.schema,
-                termclass=CustomFuzzyTerm)
+                                  termclass=CustomFuzzyTerm)
         query = parser.parse(word)
 
         # Creates a filter on the doctype field
@@ -280,7 +275,7 @@ class Indexer():
         # Processes the search (request the index, Whoosh magic)
         with indexSchema.index.searcher() as searcher:
             results = searcher.search_page(query, numPage, pagelen=numByPage,
-                                                        filter=docTypeFilter)
+                                           filter=docTypeFilter)
 
             resultsID = [result["docId"] for result in results]
             logger.info("Results: %s" % resultsID)
@@ -290,7 +285,6 @@ class Indexer():
                 return {'ids': resultsID, 'numResults': len(results)}
             else:
                 return {'ids': resultsID}
-
 
     def remove_doc(self, id):
         """

@@ -2,6 +2,7 @@ from tornado.escape import json_encode
 
 from handlers.base import BaseHandler
 from lib.indexer import Indexer
+from lib.version import VERSION
 
 import logging
 logger = logging.getLogger('cozy-data-indexer.' + __name__)
@@ -13,7 +14,7 @@ class VersionHandler(BaseHandler):
     '''
 
     def get(self):
-        self.write("Cozy Data Indexer v1.0.0")
+        self.write("Cozy Data Indexer v{}".format(VERSION))
 
 
 class IndexHandler(BaseHandler):
@@ -37,13 +38,13 @@ class IndexHandler(BaseHandler):
         fields = self.get_field("fields")
         fieldsType = self.get_field('fieldsType', {})
 
-        if not "id" in doc:
+        if "id" not in doc:
             id = doc.get("_id", None)
             if id is None:
                 self.raise_argument_error("doc.id")
             else:
                 doc["id"] = id
-        if not "tags" in doc:
+        if "tags" not in doc:
             doc["tags"] = []
 
         docType = doc.get("docType", None)
