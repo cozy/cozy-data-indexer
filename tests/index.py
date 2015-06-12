@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import os
+import sys
+
 from lettuce import step, world
 from nose.tools import assert_equals
+
+current_directory = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0, os.path.join(current_directory, '..', 'cozyindexer'))
 
 from lib.indexer import Indexer
 

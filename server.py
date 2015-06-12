@@ -4,7 +4,7 @@ import sys
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 sys.path.remove(current_directory)
-sys.path.insert(0, os.path.join(current_directory, 'cozy-indexer'))
+sys.path.insert(0, os.path.join(current_directory, 'cozyindexer'))
 
 from server import main
 
