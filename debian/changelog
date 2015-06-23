@@ -1,3 +1,15 @@
+cozy-indexer (1.0.6) unstable; urgency=medium
+
+  * Fix version for Debian
+
+ -- Cozy Debian Packaging <debian-packaging@cozycloud.cc>  Tue, 23 Jun 2015 15:04:57 +0000
+
+cozy-indexer (1.0.5) unstable; urgency=medium
+
+  * Release 1.0.5
+
+ -- Cozy Debian Packaging <debian-packaging@cozycloud.cc>  Tue, 23 Jun 2015 14:53:28 +0000
+
 cozy-indexer (1.0.5a9) unstable; urgency=low
 
   * Initial Release.
