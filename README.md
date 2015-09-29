@@ -27,12 +27,12 @@ Start the server:
 ## Contribution
 
 * Bring Whoosh features to the REST API.
-* Pick and solve an [issue](https://github.com/mycozycloud/cozy-data-indexer/issues)
+* Pick and solve an [issue](https://github.com/cozy/cozy-data-indexer/issues)
 
 ## Tests
 
 [![Build
-Status](https://travis-ci.org/mycozycloud/cozy-data-indexer.png?branch=master)](https://travis-ci.org/mycozycloud/cozy-data-indexer)
+Status](https://travis-ci.org/cozy/cozy-data-indexer.png?branch=master)](https://travis-ci.org/cozy/cozy-data-indexer)
 
 Install development dependencies
 
@@ -48,7 +48,7 @@ Cozy Data Indexer is developed by Cozy Cloud and distributed under the AGPL v3 l
 
 ## What is Cozy?
 
-![Cozy Logo](https://raw.github.com/mycozycloud/cozy-setup/gh-pages/assets/images/happycloud.png)
+![Cozy Logo](https://raw.github.com/cozy/cozy-setup/gh-pages/assets/images/happycloud.png)
 
 [Cozy](http://cozy.io) is a platform that brings all your web services in the
 same private space.  With it, your web apps and your devices can share data
@@ -61,5 +61,5 @@ You can reach the Cozy Community by:
 
 * Chatting with us on IRC #cozycloud on irc.freenode.net
 * Posting on our [Forum](https://forum.cozy.io/)
-* Posting issues on the [Github repos](https://github.com/mycozycloud/)
+* Posting issues on the [Github repos](https://github.com/cozy/)
 * Mentioning us on [Twitter](http://twitter.com/mycozycloud)
